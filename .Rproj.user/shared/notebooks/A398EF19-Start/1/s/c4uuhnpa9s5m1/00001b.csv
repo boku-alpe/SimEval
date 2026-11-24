@@ -1,7 +1,0 @@
-"0",""
-"0","plot("
-"0","  OmegaResults$U,"
-"0","  legend = FALSE,"
-"0","  col = ""purple"","
-"0","  main = ""U: Underestimation"""
-"0",")"

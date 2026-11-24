@@ -1,8 +1,0 @@
-"0","if (analysis_mode == ""single"") {"
-"0","  "
-"0","  knitr::kable("
-"0","    omega_single,"
-"0","    digits = 4,"
-"0","    caption = ""Omega-Ergebnisse der einzelnen Simulation"""
-"0","  )"
-"0","}"

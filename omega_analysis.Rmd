@@ -115,7 +115,7 @@ if (!exists("OmegaTeval")) {
 
 ```{r configuration}
 
-analysis_mode <- "single"
+analysis_mode <- "multiple"
 
 thobs <- 0.1
 thsim <- 0.1
@@ -483,6 +483,10 @@ if (analysis_mode == "multiple") {
 
 if (analysis_mode == "multiple") {
   
+  # ----------------------------------------------------------
+  # ggtern prüfen und laden
+  # ----------------------------------------------------------
+  
   if (!requireNamespace("ggtern", quietly = TRUE)) {
     stop(
       "Das Paket 'ggtern' ist nicht installiert.\n\n",
@@ -494,7 +498,7 @@ if (analysis_mode == "multiple") {
   library(ggtern)
   
   # ----------------------------------------------------------
-  # Prüfen, ob IDs und Dateipfade zusammenpassen
+  # Prüfen, ob IDs und Simulationspfade zusammenpassen
   # ----------------------------------------------------------
   
   if (
@@ -502,26 +506,44 @@ if (analysis_mode == "multiple") {
       length(multiple_simulation_paths)
   ) {
     stop(
-      "Die Anzahl der IDs und Simulationspfade stimmt nicht überein."
+      "Die Anzahl der Simulationen in dat.omega und ",
+      "multiple_simulation_paths stimmt nicht überein."
+    )
+  }
+  
+  if (
+    length(dat.omega$ID) !=
+      length(multiple_simulation_ids)
+  ) {
+    stop(
+      "Die Anzahl der Simulationen in dat.omega und ",
+      "multiple_simulation_ids stimmt nicht überein."
     )
   }
   
   # ----------------------------------------------------------
-  # Kopie der Ergebnistabelle erstellen
+  # Ergebnistabelle für den Plot vorbereiten
   # ----------------------------------------------------------
   
   dat.ternary <- dat.omega
   
-  # Vollständiger Pfad zur Datenquelle
+  # Vollständige Datenquelle
   dat.ternary$source_path <- multiple_simulation_paths
   
-  # Nur Dateiname für eine übersichtliche Beschriftung
+  # Nur Dateiname ohne vollständigen Pfad
   dat.ternary$source_file <- basename(
     multiple_simulation_paths
   )
   
+  # Lesbare Bezeichnung für die Legende
+  dat.ternary$source_label <- paste0(
+    dat.ternary$ID,
+    " | ",
+    dat.ternary$source_file
+  )
+  
   # Beschriftung direkt am Punkt
-  dat.ternary$label <- paste0(
+  dat.ternary$point_label <- paste0(
     dat.ternary$ID,
     "\nOmega = ",
     format(
@@ -535,11 +557,39 @@ if (analysis_mode == "multiple") {
     dat.ternary$source_file
   )
   
-  # Legendentext mit ID und Dateiname
-  dat.ternary$source_label <- paste0(
-    dat.ternary$ID,
-    " | ",
-    dat.ternary$source_file
+  # ----------------------------------------------------------
+  # Polygone für alpha-, beta- und gamma-dominierte Bereiche
+  # ----------------------------------------------------------
+  
+  # Alpha-dominierter Bereich: alpha >= 0.5
+  dat.alpha <- data.frame(
+    beta = c(0.5, 0, 0),
+    alpha = c(0.5, 0.5, 1),
+    gamma = c(0, 0.5, 0)
+  )
+  
+  # Beta-dominierter Bereich: beta >= 0.5
+  dat.beta <- data.frame(
+    beta = c(1, 0.5, 0.5),
+    alpha = c(0, 0, 0.5),
+    gamma = c(0, 0.5, 0)
+  )
+  
+  # Gamma-dominierter Bereich: gamma >= 0.5
+  dat.gamma <- data.frame(
+    beta = c(0, 0.5, 0),
+    alpha = c(0, 0, 0.5),
+    gamma = c(1, 0.5, 0.5)
+  )
+  
+  # ----------------------------------------------------------
+  # Linie für Omega[T] >= 0
+  # ----------------------------------------------------------
+  
+  dat.line <- data.frame(
+    beta = c(0.5, 0),
+    alpha = c(0.5, 0.5),
+    gamma = c(0, 0.5)
   )
   
   # ----------------------------------------------------------
@@ -555,26 +605,140 @@ if (analysis_mode == "multiple") {
       colour = source_label
     )
   ) +
-    geom_point(
-      size = 4
+    
+    # Alpha-dominierter Bereich
+    geom_polygon(
+      data = dat.alpha,
+      aes(
+        x = beta,
+        y = alpha,
+        z = gamma
+      ),
+      inherit.aes = FALSE,
+      colour = "grey40",
+      fill = "red",
+      alpha = 0.10,
+      show.legend = FALSE
     ) +
+    
+    # Beta-dominierter Bereich
+    geom_polygon(
+      data = dat.beta,
+      aes(
+        x = beta,
+        y = alpha,
+        z = gamma
+      ),
+      inherit.aes = FALSE,
+      colour = "grey40",
+      fill = "blue",
+      alpha = 0.10,
+      show.legend = FALSE
+    ) +
+    
+    # Gamma-dominierter Bereich
+    geom_polygon(
+      data = dat.gamma,
+      aes(
+        x = beta,
+        y = alpha,
+        z = gamma
+      ),
+      inherit.aes = FALSE,
+      colour = "grey40",
+      fill = "green",
+      alpha = 0.10,
+      show.legend = FALSE
+    ) +
+    
+    # Linie für Omega[T] >= 0
+    geom_line(
+      data = dat.line,
+      aes(
+        x = beta,
+        y = alpha,
+        z = gamma
+      ),
+      inherit.aes = FALSE,
+      colour = "black",
+      linewidth = 1
+    ) +
+    
+    # Simulationspunkte
+    geom_point(
+      size = 4,
+      alpha = 1
+    ) +
+    
+    # Beschriftung der Simulationspunkte
     geom_text(
       aes(
-        label = label
+        label = point_label
       ),
       vjust = -0.8,
       size = 3,
       show.legend = FALSE
     ) +
+    
+    # Beschriftung des beta-dominierten Bereichs
+    annotate(
+      "text",
+      x = 0.65,
+      y = 0.20,
+      z = 0.15,
+      label = "beta >= 0.5",
+      parse = TRUE,
+      colour = "blue",
+      size = 4
+    ) +
+    
+    # Beschriftung des gamma-dominierten Bereichs
+    annotate(
+      "text",
+      x = 0.15,
+      y = 0.20,
+      z = 0.65,
+      label = "gamma >= 0.5",
+      parse = TRUE,
+      colour = "darkgreen",
+      size = 4
+    ) +
+    
+    # Beschriftung des alpha-dominierten Bereichs
+    annotate(
+      "text",
+      x = 0.10,
+      y = 0.80,
+      z = 0.10,
+      label = "alpha >= 0.5",
+      parse = TRUE,
+      colour = "red",
+      size = 4
+    ) +
+    
+    # Beschriftung der Omega-Linie
+    annotate(
+      "text",
+      x = 0.25,
+      y = 0.45,
+      z = 0.25,
+      label = "Omega[T] >= 0",
+      parse = TRUE,
+      colour = "black",
+      size = 4
+    ) +
+    
     labs(
       title = "Omega-Komponenten mehrerer Simulationen",
-      subtitle = "Datenquelle der einzelnen Simulationspunkte",
-      T = "β",
-      L = "α",
-      R = "γ",
+      subtitle = "Dominanzbereiche und Datenquellen",
+      T = "beta",
+      L = "alpha",
+      R = "gamma",
       colour = "Datenquelle"
     ) +
+    
     theme_bw() +
+    
     theme(
       legend.position = "right",
       plot.title = element_text(
@@ -582,10 +746,13 @@ if (analysis_mode == "multiple") {
       ),
       plot.subtitle = element_text(
         size = 10
+      ),
+      legend.text = element_text(
+        size = 8
       )
     )
   
-  # Plot im R Markdown-Dokument anzeigen
+  # Plot im R-Markdown-Dokument anzeigen
   print(ternary_plot)
 }
 ```
@@ -595,82 +762,11 @@ if (analysis_mode == "multiple") {
 
 if (analysis_mode == "multiple") {
   
-  if (!requireNamespace("ggtern", quietly = TRUE)) {
+  if (!exists("ternary_plot")) {
     stop(
-      "Das Paket 'ggtern' ist nicht installiert.\n\n",
-      "Bitte installieren Sie es mit:\n",
-      "install.packages('ggtern')"
+      "Der Ternärplot wurde noch nicht erstellt."
     )
   }
-  
-  library(ggtern)
-  
-  dat.ternary <- dat.omega
-  
-  dat.ternary$source_path <- multiple_simulation_paths
-  
-  dat.ternary$source_file <- basename(
-    multiple_simulation_paths
-  )
-  
-  dat.ternary$label <- paste0(
-    dat.ternary$ID,
-    "\nOmega = ",
-    format(
-      round(
-        dat.ternary$omega,
-        3
-      ),
-      nsmall = 3
-    ),
-    "\n",
-    dat.ternary$source_file
-  )
-  
-  dat.ternary$source_label <- paste0(
-    dat.ternary$ID,
-    " | ",
-    dat.ternary$source_file
-  )
-  
-  ternary_plot <- ggtern(
-    data = dat.ternary,
-    aes(
-      x = beta,
-      y = alpha,
-      z = gamma,
-      colour = source_label
-    )
-  ) +
-    geom_point(
-      size = 4
-    ) +
-    geom_text(
-      aes(
-        label = label
-      ),
-      vjust = -0.8,
-      size = 3,
-      show.legend = FALSE
-    ) +
-    labs(
-      title = "Omega-Komponenten mehrerer Simulationen",
-      subtitle = "Datenquelle der einzelnen Simulationspunkte",
-      T = "β",
-      L = "α",
-      R = "γ",
-      colour = "Datenquelle"
-    ) +
-    theme_bw() +
-    theme(
-      legend.position = "right",
-      plot.title = element_text(
-        face = "bold"
-      ),
-      plot.subtitle = element_text(
-        size = 10
-      )
-    )
   
   ggplot2::ggsave(
     filename = file.path(
@@ -684,7 +780,13 @@ if (analysis_mode == "multiple") {
     dpi = 200
   )
   
-  print(ternary_plot)
+  cat(
+    "Ternärplot gespeichert unter:\n",
+    file.path(
+      plot_directory,
+      "08_ternary_multiple_simulations.png"
+    )
+  )
 }
 ```
 # 9. Status

@@ -1,8 +1,0 @@
-"0","if (analysis_mode == ""multiple"") {"
-"0","  "
-"0","  knitr::kable("
-"0","    dat.omega,"
-"0","    digits = 4,"
-"0","    caption = ""Omega-Ergebnisse mehrerer Simulationen"""
-"0","  )"
-"0","}"

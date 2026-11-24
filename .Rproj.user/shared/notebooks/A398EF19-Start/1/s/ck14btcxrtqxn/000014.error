@@ -1,1 +1,0 @@
-{"frames":[{"func":"stop(\n      \"Die Anzahl der Simulationspfade und IDs stimmt nicht überein.\"\n    )","file":"","line_number":11,"end_line_number":13,"character_number":5,"end_character_number":5}],"message":"Fehler: Die Anzahl der Simulationspfade und IDs stimmt nicht überein.\n"}
