@@ -1,0 +1,1 @@
+{"frames":[{"func":"stop(\n      \"Die Metadatendatei wurde nicht gefunden:\\n\",\n      metadata_path\n    )","file":"","line_number":9,"end_line_number":12,"character_number":5,"end_character_number":5}],"message":"Fehler: Die Metadatendatei wurde nicht gefunden:\nF:/GitHub/SimEval/data/metadatasimulations.csv\n"}

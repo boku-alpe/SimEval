@@ -1,0 +1,7 @@
+"0",""
+"0","plot("
+"0","  depo.sim.plot,"
+"0","  legend = FALSE,"
+"0","  col = ""salmon"","
+"0","  main = ""Simulated"""
+"0",")"

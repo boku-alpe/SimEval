@@ -1,0 +1,32 @@
+{
+    "id": "5C8FCC9D",
+    "path": "F:/GitHub/SimEval/Readme.Rmd",
+    "project_path": "Readme.Rmd",
+    "type": "r_markdown",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1794995339216.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "545,0",
+        "scrollLine": "502",
+        "rmdVisualMode": "true",
+        "rmdVisualWrapConfigured": "true",
+        "docOutlineVisible": "1",
+        "rmdVisualModeLocation": "9455:8338.400390625",
+        "rmdVisualCollapsedChunks": ""
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1795513708,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1795513708563,
+    "read_only": false,
+    "read_only_alternatives": []
+}

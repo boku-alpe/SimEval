@@ -1,0 +1,7 @@
+"0",""
+"0","plot("
+"0","  OmegaResults$T,"
+"0","  legend = FALSE,"
+"0","  col = ""grey50"","
+"0","  main = ""T: Union"""
+"0",")"
